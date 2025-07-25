@@ -1,4 +1,5 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+import MessageFactory from 'Database/factories/MessageFactory'
 
 export default class extends BaseSeeder {
   public async run() {
@@ -13,5 +14,6 @@ export default class extends BaseSeeder {
     //     .merge({ userId: user.id }) // Hubungkan dengan user yang ada
     //     .createMany(3)
     // }
+    await MessageFactory.createMany(1000)
   }
 }

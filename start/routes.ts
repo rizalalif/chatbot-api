@@ -21,7 +21,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.get('/', async () => {
-  return { hello: 'world' }
+  return { status: 'OK' }
 })
 
 
@@ -32,10 +32,11 @@ Route.group(() => {
   Route.group(() => {
     Route.get('/', 'ConversationsController.index')
     Route.get('/:sessionId', 'ConversationsController.showChat')
-    
+
     Route.post('/question', 'ConversationsController.create')
-    Route.post('/:id/question', 'ConversationsController.create')
-    
+    Route.post('/:sessionId/question', 'ConversationsController.replyExistConversation')
+    Route.delete('/:id', 'ConversationsController.destroy')
+
   }).middleware('auth:api')
     .prefix('conversation')
 

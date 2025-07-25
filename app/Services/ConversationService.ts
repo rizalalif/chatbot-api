@@ -27,35 +27,52 @@ export default class ConversationService {
             })
 
             if (!conversation.$isLocal) {
-                const lastMessage = conversation.lastMessage
-                message = `${lastMessage},${message} `
+                console.log('exist');
+                const recentMessages = (await conversation.related('messages').query().select('content', 'role').orderBy('created_at', 'desc').limit(10)).map((msg) => {
+                    return `${msg.role}: ${msg.content} \n`
+                })
+                // console.log(recentMessages);
+
+                message = `${recentMessages},\n user:${message}`
             }
 
-            const aiResponse: string = await this.aiService.sendMessageToBot(message, conversation.sessionId)
-            console.log(aiResponse);
+            // console.log();
 
-            await Message.create({ content: aiResponse, conversationId: conversation.id, role: 'ai' })
 
-            return { conversationId: conversation.id, aiResponse }
+            const replied = await this.aiService.sendMessageToBot(message, conversation.sessionId)
+
+            await Message.create({ content: replied.AI, conversationId: conversation.id, role: 'ai' })
+
+            return { sessionId: replied.sessionId, AI: replied.AI, User: message }
         } catch (error) {
             console.error(error)
             throw new Error(error.message)
         }
     }
 
-    async getMessages(sessionId: string, userId: string) {
+    async getMessages(sessionId: string, userId: string, page: number = 1, limit: number = 5) {
 
-        const messages = await Message.query().preload('conversation', (query) => {
-            query.where('sessionId', sessionId).andWhere('user_id', userId).orderBy('created_at', 'desc')
-        })
-        // const serialize = messages.map((msg) => msg.serialize())
+        const conversation = await Conversation.query()
+            .where('session_id', sessionId)
+            .where('user_id', userId)
+            .select('id', 'session_id', 'title', 'created_at').firstOrFail()
+
+
+        const messages = await conversation.related('messages').query().select('id', 'content', 'role', 'created_at').orderBy('created_at', 'desc').paginate(page, limit)
 
         return messages
 
-        // const postJson = messages.map((post) => post.sessionId == sessionId)
-
-
-
 
     }
+
+    async deleteConversation(id: string) {
+        const conversation = await Conversation.findOrFail(id)
+        await conversation.delete()
+    }
+
+    // async continueConversation(sessionId: string, message: string) {
+    //     const recentMessages = Message.query().where('session_id', sessionId).limit(4).orderBy('created_at', 'desc')
+
+
+    // }
 }

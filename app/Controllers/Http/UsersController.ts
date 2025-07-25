@@ -18,12 +18,12 @@ export default class UsersController {
 
     async login({ auth, request, response }: HttpContextContract) {
         const { email, password } = request.body()
-            
-            const token = await auth.use('api').attempt(email, password, {
-                expiresIn: '24hours'
-            })
-            return token.toJSON()
-        
+        const expiresIn = '60 mins';
+        const token = await auth.use('api').attempt(email, password, {
+            expiresIn
+        })
+        return token.toJSON()
+
     }
 
 }
