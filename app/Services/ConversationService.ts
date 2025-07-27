@@ -16,38 +16,42 @@ export default class ConversationService {
     }
 
     async createConversation(userId: string, message: string, sessionId: string | undefined = uuidv7()) {
-        try {
-            // const existConversation = await Conversation.findByOrFail('user_id', userId)
-            const conversation = await Conversation.firstOrCreate({ sessionId, userId }, { title: message, sessionId, userId })
-            // const newConversation = await Conversation.create({ title: message, sessionId, userId })
-            await Message.create({
-                content: message,
-                conversationId: conversation.id,
-                role: 'user'
-            })
-
-            if (!conversation.$isLocal) {
-                console.log('exist');
-                const recentMessages = (await conversation.related('messages').query().select('content', 'role').orderBy('created_at', 'desc').limit(10)).map((msg) => {
-                    return `${msg.role}: ${msg.content} \n`
-                })
-                // console.log(recentMessages);
-
-                message = `${recentMessages},\n user:${message}`
-            }
-
-            // console.log();
-
-
-            const replied = await this.aiService.sendMessageToBot(message, conversation.sessionId)
-
-            await Message.create({ content: replied.AI, conversationId: conversation.id, role: 'ai' })
-
-            return { sessionId: replied.sessionId, AI: replied.AI, User: message }
-        } catch (error) {
-            console.error(error)
-            throw new Error(error.message)
+        // const existConversation = await Conversation.findByOrFail('user_id', userId)
+        const conversation = await Conversation.firstOrCreate({ sessionId, userId }, { title: message, sessionId, userId })
+        // const newConversation = await Conversation.create({ title: message, sessionId, userId })
+        await Message.create({
+            content: message,
+            conversationId: conversation.id,
+            role: 'user'
+        })
+        let prompt = {
+            recentMessage: ' ',
+            message
         }
+
+        if (!conversation.$isLocal) {
+            console.log('exist');
+            const getRecent = (await conversation.related('messages').query().select('content', 'role').orderBy('created_at', 'desc').limit(10)).map((msg) => {
+                return `${msg.role}: ${msg.content} \n`
+            })
+            // console.log(recentMessages);
+
+            const recentMessage = `${getRecent},`
+            prompt = {
+                recentMessage,
+                message
+
+            }
+        }
+
+        // console.log();
+
+
+        const replied = await this.aiService.sendMessageToBot(prompt, conversation.sessionId)
+
+        await Message.create({ content: replied.AI, conversationId: conversation.id, role: 'ai' })
+
+        return { sessionId: replied.sessionId, AI: replied.AI, User: message }
     }
 
     async getMessages(sessionId: string, userId: string, page: number = 1, limit: number = 5) {

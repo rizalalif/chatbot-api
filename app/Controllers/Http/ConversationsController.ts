@@ -1,6 +1,7 @@
 import { inject } from '@adonisjs/core/build/standalone';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import ConversationService from 'App/Services/ConversationService';
+import CreateConversationValidator from 'App/Validators/Conversation/CreateConversationValidator';
 
 
 @inject()
@@ -17,17 +18,14 @@ export default class ConversationsController {
       message: "OK",
       data
     })
-
-
-
   }
 
   public async create({ auth, request, response }: HttpContextContract) {
     const userId = auth.user?.id!
     await auth.use('api').authenticate();
     console.log(auth.user?.email);
-    const payload = request.only(["message"])
-    const { sessionId, AI } = await this.conversationService.createConversation(userId, payload.message)
+    const { message } = await request.validate(CreateConversationValidator)
+    const { sessionId, AI } = await this.conversationService.createConversation(userId, message)
 
     const data = {
       sessionId,
@@ -64,31 +62,25 @@ export default class ConversationsController {
   }
 
   public async showChat({ auth, request, response }: HttpContextContract) {
-    try {
-      const userId = auth.user?.id!
-      // const userId = "019832ec-16c5-766a-8ef5-62b3c5570fa1"
-      const sessionId = request.param('sessionId')
-      const page = request.input('page')
-      const limit = request.input('limit')
-      console.log(sessionId);
-      console.log(auth.user?.email);
+    const userId = auth.user?.id!
+    // const userId = "019832ec-16c5-766a-8ef5-62b3c5570fa1"
+    const sessionId = request.param('sessionId')
+    const page = request.input('page')
+    const limit = request.input('limit')
+    console.log(sessionId);
+    console.log(auth.user?.email);
 
-      const messages = await this.conversationService.getMessages(sessionId, userId, page, limit)
+    const messages = await this.conversationService.getMessages(sessionId, userId, page, limit)
 
-      return response.ok({
-        statusCode: response.getStatus(),
-        message: "OK",
-        data: messages
-      })
+    return response.ok({
+      statusCode: response.getStatus(),
+      message: "OK",
+      data: messages
+    })
 
-    } catch (error) {
-      return response.notFound({
-        message: error
-      })
-    }
   }
 
-  public async destroy({ auth, request, response }: HttpContextContract) {
+  public async destroy({ auth, request }: HttpContextContract) {
     // const userId = auth.user?.id!
     await auth.use('api').authenticate();
     const conversationId = request.param('id')
