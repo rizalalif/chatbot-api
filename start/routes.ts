@@ -28,6 +28,7 @@ Route.get('/', async () => {
 Route.group(() => {
   Route.post('/register', 'UsersController.register')
   Route.post('/login', 'UsersController.login')
+  Route.post('/logout', 'UsersController.logout').middleware('auth:api')
 
   Route.group(() => {
     Route.get('/', 'ConversationsController.index')
@@ -35,7 +36,7 @@ Route.group(() => {
 
     Route.post('/question', 'ConversationsController.create')
     Route.post('/:sessionId/question', 'ConversationsController.replyExistConversation')
-    Route.delete('/:id', 'ConversationsController.destroy')
+    Route.delete('/:id/delete', 'ConversationsController.destroy')
 
   }).middleware('auth:api')
     .prefix('conversation')

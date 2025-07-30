@@ -26,7 +26,7 @@ export default class CreateConversationValidator {
   public schema = schema.create({
     message: schema.string({ trim: true }, [
       rules.required(),
-      rules.maxLength(100)
+      rules.maxLength(500)
     ])
   })
 

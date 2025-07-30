@@ -9,6 +9,7 @@ export default class ConversationService {
     constructor(protected aiService: AiService) { }
     async getConversation(user_id: string) {
         const conversations = await Conversation.query()
+            .select(['id', 'session_id', 'title', 'created_at'])
             .where('user_id', user_id) // <-- Gunakan nilai string dari ID pengguna
             .orderBy('updated_at', 'desc')
 
@@ -30,11 +31,9 @@ export default class ConversationService {
         }
 
         if (!conversation.$isLocal) {
-            console.log('exist');
             const getRecent = (await conversation.related('messages').query().select('content', 'role').orderBy('created_at', 'desc').limit(10)).map((msg) => {
                 return `${msg.role}: ${msg.content} \n`
             })
-            // console.log(recentMessages);
 
             const recentMessage = `${getRecent},`
             prompt = {
@@ -44,14 +43,13 @@ export default class ConversationService {
             }
         }
 
-        // console.log();
 
 
         const replied = await this.aiService.sendMessageToBot(prompt, conversation.sessionId)
 
         await Message.create({ content: replied.AI, conversationId: conversation.id, role: 'ai' })
 
-        return { sessionId: replied.sessionId, AI: replied.AI, User: message }
+        return { sessionId: replied.sessionId, AI: replied.AI, User: prompt }
     }
 
     async getMessages(sessionId: string, userId: string, page: number = 1, limit: number = 5) {

@@ -44,6 +44,13 @@ export default class ExceptionHandler extends HttpExceptionHandler {
       })
     }
 
+    if (error.code === 'E_ROUTE_NOT_FOUND') {
+      return ctx.response.status(404).send({
+        statusCode: ctx.response.getStatus(),
+        message: 'Route Not Found',
+      })
+    }
+
     if (error.code === 'E_UNAUTHORIZED_ACCESS') {
       return ctx.response.status(403).send({
         statusCode: ctx.response.getStatus(),
@@ -60,7 +67,7 @@ export default class ExceptionHandler extends HttpExceptionHandler {
     if (error instanceof DatabaseError) {
       return ctx.response.status(500).send({
         statusCode: ctx.response.getStatus(),
-        message: 'Database Error',
+        message: 'Internal Server Error',
       })
     }
 

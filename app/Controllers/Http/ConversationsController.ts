@@ -23,15 +23,8 @@ export default class ConversationsController {
   public async create({ auth, request, response }: HttpContextContract) {
     const userId = auth.user?.id!
     await auth.use('api').authenticate();
-    console.log(auth.user?.email);
     const { message } = await request.validate(CreateConversationValidator)
-    const { sessionId, AI } = await this.conversationService.createConversation(userId, message)
-
-    const data = {
-      sessionId,
-      AI
-    }
-
+    const data = await this.conversationService.createConversation(userId, message)
     return response.ok({
       statusCode: response.getStatus(),
       message: "OK",
@@ -43,16 +36,9 @@ export default class ConversationsController {
   public async replyExistConversation({ auth, request, response }: HttpContextContract) {
     const userId = auth.user?.id!
     await auth.use('api').authenticate();
-    const payload = request.only(["message"])
-
+    const { message } = await request.validate(CreateConversationValidator)
     const { sessionId } = request.params()
-    const replied = await this.conversationService.createConversation(userId, payload.message, sessionId)
-    const data = {
-      sessionId: replied.sessionId,
-      AI: replied.AI,
-      User: replied.User,
-    }
-
+    const data = await this.conversationService.createConversation(userId, message, sessionId)
     return response.ok({
       statusCode: response.getStatus(),
       message: "OK",
@@ -63,15 +49,10 @@ export default class ConversationsController {
 
   public async showChat({ auth, request, response }: HttpContextContract) {
     const userId = auth.user?.id!
-    // const userId = "019832ec-16c5-766a-8ef5-62b3c5570fa1"
     const sessionId = request.param('sessionId')
     const page = request.input('page')
     const limit = request.input('limit')
-    console.log(sessionId);
-    console.log(auth.user?.email);
-
     const messages = await this.conversationService.getMessages(sessionId, userId, page, limit)
-
     return response.ok({
       statusCode: response.getStatus(),
       message: "OK",
@@ -80,12 +61,14 @@ export default class ConversationsController {
 
   }
 
-  public async destroy({ auth, request }: HttpContextContract) {
-    // const userId = auth.user?.id!
+  public async destroy({ auth, request, response }: HttpContextContract) {
     await auth.use('api').authenticate();
     const conversationId = request.param('id')
     await this.conversationService.deleteConversation(conversationId)
-
+    return response.ok({
+      statusCode: response.getStatus(),
+      message: "OK",
+    })
 
   }
   public async update({ }: HttpContextContract) { }

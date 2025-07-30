@@ -17,13 +17,27 @@ export default class UsersController {
     }
 
     async login({ auth, request, response }: HttpContextContract) {
-        const { email, password } = request.body()
+        const { email, password } = request.only(['email', 'password'])
         const expiresIn = '60 mins';
         const token = await auth.use('api').attempt(email, password, {
             expiresIn
         })
-        return token.toJSON()
+        const data = { user: auth.user, token }
+        return response.ok({
+            statusCode: response.getStatus(),
+            message: "OK",
+            data
+        })
 
+    }
+
+    async logout({ auth, request, response }: HttpContextContract) {
+
+        await auth.use('api').revoke()
+        return response.ok({
+            statusCode: response.getStatus(),
+            message: "OK",
+        })
     }
 
 }
