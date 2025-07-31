@@ -114,18 +114,9 @@ Authorization : <token>
         "statusCode": 200,
         "message": "OK",
         "data": {
-            "user": {
-            "id": "01983997-2856-7343-aa0f-43cdbaf91589",
-            "email": "budi@gmail.com",
-            "username": "budi",
-            "created_at": "2025-07-24T06:21:04.406+07:00",
-            "updated_at": "2025-07-24T06:21:04.406+07:00"
-        },
-        "token": {
-            "type": "bearer",
-            "token": <token created>,
-            "expires_at": <expired token>
-        }
+            "sessionId": "sessionId",
+            "AI": "Halo! Bagaimana saya bisa membantu Anda hari ini? 😊",
+            "User": "apa saja layanan majdigi!"
         }
     }
 ```
