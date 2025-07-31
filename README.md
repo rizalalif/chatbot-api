@@ -104,8 +104,7 @@ Authorization : <token>
 
 ```json
     {
-        "email": "budi@example.com",
-        "password": "12345678",
+        "message": "budi@example.com",
     }
 ```
 
