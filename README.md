@@ -1,4 +1,4 @@
-## 📚 Spesifikasi API
+## 📚 API Specifications
 
 **Base URL**: `http://host:port/api`
 
