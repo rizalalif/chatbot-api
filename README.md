@@ -24,7 +24,7 @@ Semua permintaan ke endpoint yang dilindungi harus menyertakan header `Authoriza
     }
 ```
 
-**Respons OK** (`201 Created`)
+**Respons OK** (`200`)
 ```json
     {
         "statusCode": 200,
@@ -61,7 +61,7 @@ Semua permintaan ke endpoint yang dilindungi harus menyertakan header `Authoriza
     }
 ```
 
-**Respons OK** (`201 Created`)
+**Respons OK** (`200`)
 ```json
     {
         "statusCode": 200,
@@ -104,11 +104,11 @@ Authorization : <token>
 
 ```json
     {
-        "message": "budi@example.com",
+        "message": "new messagse",
     }
 ```
 
-**Respons OK** (`201 Created`)
+**Respons OK** (`200`)
 ```json
     {
         "statusCode": 200,
@@ -155,7 +155,7 @@ Authorization : <token>
     }
 ```
 
-**Respons OK** (`201 Created`)
+**Respons OK** (`200`)
 ```json
     {
         "statusCode": 200,
@@ -165,6 +165,14 @@ Authorization : <token>
             "AI": "Halo! Bagaimana saya bisa membantu Anda hari ini? 😊",
             "User": "apa saja layanan majdigi!"
         }
+    }
+```
+
+**Respons Error** (`502`)
+```json
+    {
+        "statusCode": 502,
+        "message": "Service Uniavailable",
     }
 ```
 
@@ -198,6 +206,13 @@ Authorization : <token>
             },
             ....
         ]
+    }
+```
+**Respons Error** (`500`)
+```json
+    {
+        "statusCode": 500,
+        "message": "Internal Server Error",
     }
 ```
 ## 7. Conversation : `GET /conversation/:sessionId?page=1`
@@ -249,12 +264,11 @@ Authorization : <token>
             }
     }
 ```
-
-**Respons Error** (`502`)
+**Respons Error** (`500`)
 ```json
     {
-        "statusCode": 502,
-        "message": "Service Unavailable",
+        "statusCode": 500,
+        "message": "Internal Server Error",
     }
 ```
 
